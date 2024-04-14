@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import time
 
 class Event(ABC):
     def __init__(self):
@@ -12,19 +13,15 @@ class Event(ABC):
         self.listeners.remove(callback)
         return self
 
-    @abstractmethod
-    def trigger(self, *args, **kwargs):
-        pass
+    async def trigger(self, *args, **kwargs):
+        for listener in self.listeners:
+            await listener(*args, **kwargs)
 
 class OnClick(Event):
-    def trigger(self, *args, **kwargs):
-        for listener in self.listeners:
-            listener(*args, **kwargs)
+    pass
 
 class OnChange(Event):
-    def trigger(self, *args, **kwargs):
-        for listener in self.listeners:
-            listener(*args, **kwargs)
+    pass
 
 class EventFactory:
     @staticmethod
@@ -48,12 +45,6 @@ class EventManager:
     def add_event_listener(self, event_name, callback):
         return EventFactory.create_event(event_name).add_listener(callback)
        
-em = EventManager()
 
-btn: Event = em.add_event_listener("onclick", lambda elem: (
-    print("Button clicked"),
-    print(elem)
-))
 
-btn.trigger("Button test")
                                     
