@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 class Event(ABC):
     def __init__(self):
         self.listeners = []
-        
 
     def add_listener(self, callback):
         self.listeners.append(callback)
@@ -27,6 +26,16 @@ class OnChange(Event):
         for listener in self.listeners:
             listener(*args, **kwargs)
 
+class EventFactory:
+    @staticmethod
+    def create_event(event_name):
+        if event_name == "onclick":
+            return OnClick()
+        elif event_name == "onchange":
+            return OnChange()
+        else:
+            raise NotImplementedError("Unknown event type: {}".format(event_name))
+
 class EventManager:
     def __init__(self):
         self.events = {}
@@ -37,18 +46,14 @@ class EventManager:
         return self.events[event_name]
 
     def add_event_listener(self, event_name, callback):
-        if event_name == "onclick":
-            return OnClick().add_listener(callback)
-        elif event_name == "onchange":
-            return OnChange().add_listener(callback)
-        else:
-            raise NotImplementedError("Unknown event type: {}".format(event_name))
+        return EventFactory.create_event(event_name).add_listener(callback)
+       
 em = EventManager()
 
-#btn: Event = em.add_event_listener("onclick", lambda elem: (
-#    print("Button clicked"),
-#    print(elem)
-#))
+btn: Event = em.add_event_listener("onclick", lambda elem: (
+    print("Button clicked"),
+    print(elem)
+))
 
-#btn.trigger("Button test")
+btn.trigger("Button test")
                                     
