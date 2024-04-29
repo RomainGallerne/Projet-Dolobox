@@ -1,9 +1,31 @@
-import requests
-from dotenv import load_dotenv
-import os
-import asyncio
-from Singleton import Singleton
+from machine import ADC, Pin
+from time import sleep
+import uasyncio
 
+btn = Pin(23, Pin.IN, Pin.PULL_UP)
+slider = ADC(Pin(36))
+slider.atten(ADC.ATTN_11DB)
+
+def do_connect():
+    import network
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    if not wlan.isconnected():
+        print('connecting to network...')
+        wlan.connect('ssid', 'key') # Id et mot de passe wifi
+        while not wlan.isconnected():
+            pass
+    print('network config:', wlan.ifconfig())
+
+def Singleton(cls):
+    instances = {}
+
+    def get_instance(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+
+    return get_instance
 
 
 @Singleton
@@ -36,26 +58,12 @@ class ApiService:
             return response.json()
         return None
 
-
-async def main():
-    api = ApiService()
-    login_response = await api.login("test", "1234")
-    token = login_response["accessToken"]
-    records = [
-        {
-            "level": 5,
-            "evaluation_date": "01-09-2022 00:01:02"
-        },
-        {
-            "level": 6,
-            "evaluation_date": "01-09-2022 0:01:01"
-        }
-    ]
-    patient_id = 6
-    add_streams_response = await api.add_streams(patient_id, records, token)
-    print(add_streams_response)
+async def press():
+    while True:
+        if(btn.value() == 0):
+            print("Mesure de douleur: "+str(slider.read()))
+            sleep(1)
         
-    
-    
 
-asyncio.run(main())
+
+uasyncio.run(press())
