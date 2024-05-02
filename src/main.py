@@ -3,8 +3,11 @@ import network
 import uasyncio
 from time import sleep
 import urequests
+import json
 
 
+pin_button = Pin(15,Pin.IN, Pin.PULL_UP)
+slider = ADC(Pin(35))
 def get_current_datetime():
     rtc = RTC()
     year, month, day, weekday, hour, minute, second, _ = rtc.datetime()
@@ -22,7 +25,7 @@ def do_connect():
     wlan.active(True)
     if not wlan.isconnected():
         print('connecting to network...')
-        wlan.connect("Morgan's Galaxy A33 5G", 'jxvz9984')
+        wlan.connect("", "") #mettre le nom et mot de passe de wifi
         while not wlan.isconnected():
             pass
     print('network config:', wlan.ifconfig())
@@ -77,24 +80,30 @@ class ApiService:
             "Content-Type": "application/json"
         }
         url = f"{self.base_url}/api/patient/{patient_id}/streams"
-        payload = {"records": records}
+        payload = json.dumps({"records": records})
+        print(payload)
+
         try:
-            response = urequests.post(url, headers=headers, json=payload)
+            response = urequests.post(url, headers=headers, data=payload)  # Utiliser data=payload au lieu de json=payload
             return response.json()
         except Exception as e:
             print("Error in add_streams request:", e)
             return None
 
+
         
 async def send_data():
     value = slider.read()
     date = get_current_datetime()
-    records = [{"level":value,"evaluation_date":date}]
+    records = [
+            {"level":value,"evaluation_date":date}
+        ]
     api = ApiService()
     print(records)
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTcxNDY2Nzc2MywiZXhwIjoxNzE0NjcxMzYzfQ.bcFqOUs2YNcEeXM-vFNmjiXIBkXSnsnEzKqe5iD58Ag"
+    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTcxNDY3MDc3OCwiZXhwIjoxNzE0Njc0Mzc4fQ.8qCnLa9SbBx2XcBSt_JJe_qBrRkPPnhFJsrGbARD0VM"
     response = await api.add_streams(1,records,token)
     print(response)
+
 def pressed(btn):
     print("pressed")
     task = uasyncio.create_task(send_data())
