@@ -63,9 +63,18 @@ def pressed(btn):
             task = uasyncio.create_task(send_data())
             loop = uasyncio.get_event_loop()
             loop.run_until_complete(task)
-
-    
+def send_data_callback(time):
+    task = uasyncio.create_task(send_data())
+    loop = uasyncio.get_event_loop()
+    loop.run_until_complete(task)    
 pin_button.irq(trigger=Pin.IRQ_FALLING, handler=pressed)
+
+tm = TimerManager()
+
+tm.set_timer('submit_timer',10,'s',send_data_callback)
+while True:
+    pass
+
 
 
 
