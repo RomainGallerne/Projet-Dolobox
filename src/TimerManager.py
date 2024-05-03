@@ -9,22 +9,23 @@ class TimerManager:
     def set_timer(self, identifier, period, units, callback):
         if identifier in self.timers:
             self.timers[identifier].deinit()  # Arrêter le timer si un timer avec le même identifiant existe déjà
-            timer = Timer(timers[identifier]["id"])
+            timer = Timer(timers[identifier]['id'])
             period_ms = self.convert_to_milliseconds(period, units)
             timer.init(period=period_ms, mode=Timer.PERIODIC, callback=callback)
-            self.timers[identifier] = timer
+            self.timers[identifier]['timer'] = timer
             return
         
         period_ms = self.convert_to_milliseconds(period, units)
         print(period_ms)
-        
-        timer = Timer(self.find_available_timer_id())
+        id = self.find_available_timer_id()
+        self.id_timers.add(id)
+        timer = Timer(id)
         timer.init(period=period_ms, mode=Timer.PERIODIC, callback=callback)
-        self.timers[identifier] = timer
+        self.timers[identifier] = {'timer':timer,'id':id}
 
     def remove_timer(self, identifier):
         if identifier in self.timers:
-            self.timers[identifier].deinit()
+            self.timers[identifier]['timer'].deinit()
             
             del self.timers[identifier]
     def find_available_timer_id(self):
@@ -44,3 +45,4 @@ class TimerManager:
             raise ValueError("Invalid units. Please use 's', 'm', or 'h'.")
     def get_timers(self):
         print(self.timers)
+        print(self.id_timers)

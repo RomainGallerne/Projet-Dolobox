@@ -63,18 +63,9 @@ def pressed(btn):
             task = uasyncio.create_task(send_data())
             loop = uasyncio.get_event_loop()
             loop.run_until_complete(task)
-def fire(e):
-    print(e)
-    print("TIMER FIRE !!")
+
     
 pin_button.irq(trigger=Pin.IRQ_FALLING, handler=pressed)
 
-tm = TimerManager()
-tm.set_timer("first_timer",1,"m",fire)
-tm.set_timer("second_timer",30,"s",fire)
-
-while True:
-    sleep(2)
-    tm.get_timers()
 
 
