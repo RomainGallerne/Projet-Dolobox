@@ -1,13 +1,18 @@
 from machine import Pin, PWM, ADC, RTC
 import network
 import uasyncio
-from time import sleep
+from time import sleep, sleep_ms
 import urequests
 import json
+from ApiService import ApiService
+import utime
+from TimerManager import TimerManager
 
 
-pin_button = Pin(15,Pin.IN, Pin.PULL_UP)
-slider = ADC(Pin(35))
+debounce_delay = 10000  # Délai de débouncing en millisecondes
+last_button_change = 0
+pin_button = Pin(23,Pin.IN, Pin.PULL_UP)
+slider = ADC(Pin(36))
 def get_current_datetime():
     rtc = RTC()
     year, month, day, weekday, hour, minute, second, _ = rtc.datetime()
@@ -31,89 +36,45 @@ def do_connect():
     print('network config:', wlan.ifconfig())
     
 
-def Singleton(cls):
-    instances = {}
-
-    def get_instance(*args, **kwargs):
-        if cls not in instances:
-            instances[cls] = cls(*args, **kwargs)
-        return instances[cls]
-
-    return get_instance
-
-
-@Singleton
-class ApiService:
-    def __init__(self):
-        # Chargez les paramètres nécessaires
-        self.base_url = "https://eriospainapi.onrender.com"
-        
-    async def login(self, username, password):
-        url = f"{self.base_url}/api/login"
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
-        payload = "username={}&password={}".format(username, password)
-        try:
-            response = urequests.post(url, headers=headers, data=payload)
-            return response.json()
-        except Exception as e:
-            print("Error in login request:", e)
-            return None
-
-    async def getUsers(self, token):
-        url = f"{self.base_url}/api/users"
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json"
-        }
-        try:
-            response = urequests.get(url, headers=headers)
-            return response.json()
-        except Exception as e:
-            print("Error in getUsers request:", e)
-            return None
-
-    async def add_streams(self, patient_id, records, token):
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json"
-        }
-        url = f"{self.base_url}/api/patient/{patient_id}/streams"
-        payload = json.dumps({"records": records})
-        print(payload)
-
-        try:
-            response = urequests.post(url, headers=headers, data=payload)  # Utiliser data=payload au lieu de json=payload
-            return response.json()
-        except Exception as e:
-            print("Error in add_streams request:", e)
-            return None
-
 
         
 async def send_data():
     value = slider.read()
+    print(value)
     date = get_current_datetime()
     records = [
             {"level":value,"evaluation_date":date}
         ]
     api = ApiService()
-    print(records)
+    #print(records)
     token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTcxNDY3MDc3OCwiZXhwIjoxNzE0Njc0Mzc4fQ.8qCnLa9SbBx2XcBSt_JJe_qBrRkPPnhFJsrGbARD0VM"
-    response = await api.add_streams(1,records,token)
-    print(response)
+    #response = await api.add_streams(1,records,token)
+    #print(response)
+
+
 
 def pressed(btn):
-    print("pressed")
-    task = uasyncio.create_task(send_data())
-    # Attendre que la tâche soit terminée
-    loop = uasyncio.get_event_loop()
-    loop.run_until_complete(task)
+    global last_button_change
+    current_time = utime.ticks_ms()
+    if current_time - last_button_change > debounce_delay:
+        if btn.value() == 0:
+            print(btn.value())
+            last_button_change = current_time
+            task = uasyncio.create_task(send_data())
+            loop = uasyncio.get_event_loop()
+            loop.run_until_complete(task)
+def fire(e):
+    print(e)
+    print("TIMER FIRE !!")
     
 pin_button.irq(trigger=Pin.IRQ_FALLING, handler=pressed)
 
-do_connect()
+tm = TimerManager()
+tm.set_timer("first_timer",1,"m",fire)
+tm.set_timer("second_timer",30,"s",fire)
 
 while True:
-    pass
+    sleep(2)
+    tm.get_timers()
+
+
