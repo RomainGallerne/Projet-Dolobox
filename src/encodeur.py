@@ -5,37 +5,26 @@ from time import sleep
 import urequests
 import json
 
+class Encoder:
+    def __init__(self,pin_un, pin_deux, pin_quatre, pin_huit):
+        self.un = Pin(pin_un,Pin.IN)
+        self.deux = Pin(pin_deux,Pin.IN)
+        self.quatre = Pin(pin_quatre,Pin.IN)
+        self.huit = Pin(pin_huit,Pin.IN)
+        self.valeurs_encodeur_rotatifs = [[0, 0, 0, 0],[1, 0, 0, 0],[0, 1, 0, 0],[1, 1, 0, 0],[0, 0, 1, 0],[1, 0, 1, 0],[0, 1, 1, 0],[1, 1, 1, 0],[0, 0, 0, 1],[1, 0, 0, 1],[0, 1, 0, 1],[1, 1, 0, 1],[0, 0, 1, 1],[1, 0, 1, 1],[0, 1, 1, 1],[1, 1, 1, 1]]
 
-un = Pin(18,Pin.IN)
-deux = Pin(22,Pin.IN)
-quatre = Pin(23,Pin.IN)
-huit = Pin(19,Pin.IN)
+    def value(self):
+        tab_releve_encodeur_rotatif = [
+           self.un.value(),
+           self.deux.value(),
+           self.quatre.value(),
+           self.huit.value()
+        ]
+        return self.valeurs_encodeur_rotatifs.index(tab_releve_encodeur_rotatif)
+encoder = Encoder(18,22,23,19)
 
-valeurs_encodeur_rotatifs = [
-        [0,0,0,0],
-        [1,0,0,0],
-        [0,1,0,0],
-        [1,1,0,0],
-        [0,0,1,0],
-        [1,0,1,0],
-        [0,1,1,0],
-        [1,1,1,0],
-        [0,0,0,1],
-        [1,0,0,1],
-        [0,1,0,1],
-        [1,1,0,1],
-        [0,0,1,1],
-        [1,0,1,1],
-        [0,1,1,1],
-        [1,1,1,1]
-    ]
 
 while True:
-    tab_releve_encodeur_rotatif = [
-           un.value(),
-           deux.value(),
-           quatre.value(),
-           huit.value()
-        ]
-    valeur_encodeur_rotatif = valeurs_encodeur_rotatifs.index(tab_releve_encodeur_rotatif)
-    print("valeur de l'encodeur rotatif :", valeur_encodeur_rotatif)
+    
+    print("valeur de l'encodeur rotatif :", encoder.value())
+    
