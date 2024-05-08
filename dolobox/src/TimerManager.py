@@ -8,9 +8,10 @@ class TimerManager:
         self.id_timers = set()
     def set_timer(self, identifier, period, units, callback):
         if identifier in self.timers:
-            self.timers[identifier].deinit()  # Arrêter le timer si un timer avec le même identifiant existe déjà
-            timer = Timer(timers[identifier]['id'])
+            self.timers[identifier]["timer"].deinit()
+            timer = Timer(self.timers[identifier]['id'])
             period_ms = self.convert_to_milliseconds(period, units)
+            print(period_ms)
             timer.init(period=period_ms, mode=Timer.PERIODIC, callback=callback)
             self.timers[identifier]['timer'] = timer
             return
@@ -25,9 +26,11 @@ class TimerManager:
 
     def remove_timer(self, identifier):
         if identifier in self.timers:
+            timer_id = self.timers[identifier]["id"]
+            self.id_timers.discard(timer_id)
             self.timers[identifier]['timer'].deinit()
-            
             del self.timers[identifier]
+            
     def find_available_timer_id(self):
         timer_id = 0
         while timer_id in self.id_timers:
@@ -46,3 +49,4 @@ class TimerManager:
     def get_timers(self):
         print(self.timers)
         print(self.id_timers)
+
