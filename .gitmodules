@@ -1,0 +1,3 @@
+[submodule "EriosPainAPI"]
+	path = EriosPainAPI
+	url = https://github.com/MorganNavel/EriosPainAPI.git
