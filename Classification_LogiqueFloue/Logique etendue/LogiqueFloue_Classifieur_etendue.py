@@ -17,7 +17,7 @@ Paramètrage
     ! CE SERONT LES DONNES QUI SERONT EXPORTES !
 """
 VALEUR_MIN_POTENTIOMETRE = 0
-VALEUR_MAX_POTENTIOMETRE = 200
+VALEUR_MAX_POTENTIOMETRE = 4095
 VALEUR_MIN_DOULEUR = 0
 VALEUR_MAX_DOULEUR = 10
 
@@ -33,9 +33,9 @@ Définition des paramètres d'entrée et de sortie.
 """
 potentiometre = ctrl.Antecedent(
     np.arange(
-        VALEUR_MIN_POTENTIOMETRE - 20, 
-        VALEUR_MAX_POTENTIOMETRE + 1, 
-        1
+        VALEUR_MIN_POTENTIOMETRE - 100, 
+        VALEUR_MAX_POTENTIOMETRE + 100, 
+        10
     ),
     'potentiometre'
 )
@@ -81,17 +81,24 @@ Assignation des classes
 """
 
 for classe_douleur in range(VALEUR_MIN_DOULEUR,VALEUR_MAX_DOULEUR + 1):
+    center = (VALEUR_MAX_POTENTIOMETRE / VALEUR_MAX_DOULEUR) * classe_douleur
 
-    potentiometre['douleur_'+str(classe_douleur)] = fuzz.gaussmf(
+    potentiometre['douleur_'+str(classe_douleur)] = fuzz.trimf(
         potentiometre.universe, 
-        (VALEUR_MAX_POTENTIOMETRE / VALEUR_MAX_DOULEUR) * classe_douleur, 
-        VALEUR_MAX_POTENTIOMETRE / (3.0 * VALEUR_MAX_DOULEUR)
+        [
+            center - VALEUR_MAX_POTENTIOMETRE/10.0,
+            center,
+            center + VALEUR_MAX_POTENTIOMETRE/10.0
+         ]
     )
     
-    douleur['douleur_'+str(classe_douleur)] = fuzz.gaussmf(
-        douleur.universe, 
-        classe_douleur,
-        0.5
+    douleur['douleur_'+str(classe_douleur)] = fuzz.trimf(
+        douleur.universe,
+        [
+            classe_douleur - 2.2,
+            classe_douleur,
+            classe_douleur + 2.2
+        ]
     )
 
 for classe_patient in range(CATEGORIE_PATIENT_MIN,CATEGORIE_PATIENT_MAX + 1):
@@ -131,13 +138,14 @@ Règles Logiques
 
    Voir la documentation de skfuzzy pour plus de détails : https://pythonhosted.org/scikit-fuzzy/
 """
+
 rules = []
 for categorie_patient in range(CATEGORIE_PATIENT_MIN,CATEGORIE_PATIENT_MAX + 1):
     for classe_douleur in range(VALEUR_MIN_DOULEUR,VALEUR_MAX_DOULEUR + 1):
     
         rule = ctrl.Rule(
             potentiometre['douleur_'+str(classe_douleur)] & patient['categorie_'+str(categorie_patient)], 
-            douleur['douleur_'+str(max(0, int(classe_douleur) - int((CATEGORIE_PATIENT_MAX-categorie_patient))))], 
+            douleur['douleur_'+str(int(max(0, classe_douleur-(1.5*categorie_patient))))]
         )
 
         rules.append(rule)
@@ -145,7 +153,6 @@ for categorie_patient in range(CATEGORIE_PATIENT_MIN,CATEGORIE_PATIENT_MAX + 1):
 douleur_ctrl = ctrl.ControlSystem(rules)
 douleur_mesure = ctrl.ControlSystemSimulation(douleur_ctrl)
 douleur_mesure.defuzzify_method = 'centroid'
-
 
 """
 Affichage des fonctions de classe calculées

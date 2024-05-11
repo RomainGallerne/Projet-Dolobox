@@ -15,7 +15,7 @@ Paramètrage
     ! CE SERONT LES DONNES QUI SERONT EXPORTES !
 """
 VALEUR_MIN_POTENTIOMETRE = 0
-VALEUR_MAX_POTENTIOMETRE = 200
+VALEUR_MAX_POTENTIOMETRE = 4095
 VALEUR_MIN_DOULEUR = 0
 VALEUR_MAX_DOULEUR = 10
 
@@ -24,22 +24,23 @@ Définition des paramètres d'entrée et de sortie.
     - potentiometre est la variable d'entrée du programme, celle-ci s'étale de @valeurMinimale à @ValeurMaximale du slider physique.
     Cette valeur du potentiomètre est analogique et converti numériquement par un autre processus, on suppose ici récupérer directement la valeur numérique, sur le domaine du potentiometre.
 
-    - douleur est la variable de sortie qu'on cherche à calculer, on définit son espace sur l'intervalle [0,10].
+    - douleur est la variable de sortie qu'on cherche à calculer, on définit son espace sur l'interva
+    lle [0,10].
 """
 potentiometre = ctrl.Antecedent(
     np.arange(
-        VALEUR_MIN_POTENTIOMETRE - 20, 
-        VALEUR_MAX_POTENTIOMETRE + 1, 
-        1
+        VALEUR_MIN_POTENTIOMETRE - 200, 
+        VALEUR_MAX_POTENTIOMETRE + 200, 
+        5
     ),
     'potentiometre'
 )
 
 douleur = ctrl.Consequent(
     np.arange(
-        VALEUR_MIN_DOULEUR - 1, 
-        VALEUR_MAX_DOULEUR + 1, 
-        0.1
+        VALEUR_MIN_DOULEUR - 2, 
+        VALEUR_MAX_DOULEUR + 2, 
+        0.5
     ),
     'douleur'
 )
@@ -67,17 +68,24 @@ Assignation des classes
 """
 
 for classe_douleur in range(VALEUR_MIN_DOULEUR,VALEUR_MAX_DOULEUR + 1):
+    center = (VALEUR_MAX_POTENTIOMETRE / VALEUR_MAX_DOULEUR) * classe_douleur
 
-    potentiometre['douleur_'+str(classe_douleur)] = fuzz.gaussmf(
+    potentiometre['douleur_'+str(classe_douleur)] = fuzz.trimf(
         potentiometre.universe, 
-        (VALEUR_MAX_POTENTIOMETRE / VALEUR_MAX_DOULEUR) * classe_douleur, 
-        VALEUR_MAX_POTENTIOMETRE / (3.0 * VALEUR_MAX_DOULEUR)
+        [
+            center - VALEUR_MAX_POTENTIOMETRE/10.0,
+            center,
+            center + VALEUR_MAX_POTENTIOMETRE/10.0
+         ]
     )
     
-    douleur['douleur_'+str(classe_douleur)] = fuzz.gaussmf(
-        douleur.universe, 
-        classe_douleur,
-        0.5
+    douleur['douleur_'+str(classe_douleur)] = fuzz.trimf(
+        douleur.universe,
+        [
+            classe_douleur - 2.2,
+            classe_douleur,
+            classe_douleur + 2.2
+        ]
     )
 """
 Affichage des fonctions d'appartenance
@@ -85,6 +93,7 @@ Affichage des fonctions d'appartenance
         potentiometre.view()
         douleur.view()
 """
+
 print("INFO : Affichage des classes potentiometre et douleur.")
 potentiometre.view()
 douleur.view()
@@ -103,7 +112,7 @@ Règles Logiques
    Voir la documentation de skfuzzy pour plus de détails : https://pythonhosted.org/scikit-fuzzy/
 """
 rules = []
-for classe_douleur in range(VALEUR_MIN_DOULEUR,VALEUR_MAX_DOULEUR + 1):
+for classe_douleur in range(VALEUR_MIN_DOULEUR, VALEUR_MAX_DOULEUR + 1):
 
     rule = ctrl.Rule(
         potentiometre['douleur_'+str(classe_douleur)], 
@@ -158,21 +167,24 @@ Fonction d'export du modèle
 """
 def exporter_modele():
     points_list = []
-    points_list_dixieme = []
+    points_list_demi = []
+
 
     for valeur_potentiometre in range(VALEUR_MIN_POTENTIOMETRE,VALEUR_MAX_POTENTIOMETRE+1):
         douleur_mesure.input['potentiometre'] = valeur_potentiometre
         douleur_mesure.compute()
 
         points_list.append([valeur_potentiometre, douleur_mesure.output['douleur']])
-        points_list_dixieme.append([valeur_potentiometre, round(douleur_mesure.output['douleur'], 1)])
+        points_list_demi.append([valeur_potentiometre, round(2.0 * douleur_mesure.output['douleur'])/2.0])
 
-        #RETIRER CETTE CONDITIONNELLE POUR SUPPRIMER L AFFICHAGE DEBUG#
-        if(valeur_potentiometre == 84):
+        
+        if(valeur_potentiometre == 950):
             print("INFO : Affichage des courbes pour l'entrée 84.")
             potentiometre.view(sim=douleur_mesure)
             douleur.view(sim=douleur_mesure)
             input()
+        
+        
         """
         Affichage DEBUG
             Pour un affichage de chaque point de la fonction, utilisez la commande suivantes ici :
@@ -180,17 +192,17 @@ def exporter_modele():
         """
 
     y_points = [point[1] for point in points_list]
-    y_points_round = [point[1] for point in points_list_dixieme]
+    y_points_demi = [point[1] for point in points_list_demi]
 
     """
     Affichage des fonctions de classes calculés :
-        Affichages(x_points, y_points, x_points_round, y_points_round)
+        Affichages(x_points, y_points, x_points_round, y_points_demi)
     """
-    Affichages(y_points, y_points_round)
+    Affichages(y_points, y_points_demi)
     input()
 
     donnees = {"classe_douleur": y_points}
-    donnees_dixieme = {"classe_douleur_entiere": y_points_round}
+    donnees_dixieme = {"classe_douleur_entiere": y_points_demi}
 
     """
     Fonction d'export au format JSON
