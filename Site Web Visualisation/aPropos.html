@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Section</title>
+    <link rel="stylesheet" href="style_aPropos.css">
+</head>
+<body>
+  <header>
+    <div class="headerBox">
+      <img src="res/img/boitier.png" alt="Logo DoloBox VIZ">
+      <div class="titre">
+        <h1 class="logo">DoloBox VIZ</h1>
+        <br>
+        <h6>Outil de visualisation de la douleur des patients</h6>
+      </div>
+          
+      <nav>
+        <ul>
+          <li><a href="accueil.html">Accueil</a></li>
+          <li><a href="aPropos.html">À propos</a></li>
+          <li><a href="connexion.html">Déconnexion</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+    
+  <main>
+    <div class="main-container">
+        <h2>Notre équipe</h2>
+        <hr>
+        <div class="members">
+            <div class="team-member">
+              <a href="https://www.linkedin.com/in/romain-gallerne-72a108200/"><img src="res/img/romain.jpg"></a>
+                <h4>Romain GALLERNE</h4>
+                <p>Master Intelligence Artificielle et Science des données</p>
+            </div>
+            <div class="team-member">
+              <a href="https://www.linkedin.com/in/morgan-navel-444647200/"><img src="res/img/morgan.jpg"></a>
+                <h4>Morgan NAVEL</h4>
+                <p>Master Génie Logiciel</p>
+            </div>
+            <div class="team-member">
+              <a href="https://www.linkedin.com/in/richard-picole-ollivier-446761201/"><img src="res/img/richard.jpg"></a>
+                <h4>Richard Picole-Ollivier</h4>
+                <p>Master Génie Logiciel</p>
+            </div>
+        </div>
+        <hr>
+        <p>
+          Site web développé dans le cadre du projet DoloBOX. <br><br>
+          Il s'agit de notre projet de TER de Master 1 Informatique à la faculté des sciences de Montpellier.<br><br>
+          Il consisite en la réalisation d'un prototype de collecte de la douleur des patients vers le dossier patient informatisé (DPI)<br> pour le projet ERIOS en partenariat avec l'Université de Montpellier et le CHU de Montpellier.<br><br>
+        </p>
+        <hr>
+        <h2>2023 - 2024</h2>
+        <hr>
+        <div class="images">
+          <a href="https://www.umontpellier.fr/"><img src="res/img/um.png"></a>
+          <a href="https://sciences.edu.umontpellier.fr/"><img src="res/img/LogoFDS.png"></a>
+          <a href="https://reseau-figure.fr/"><img src="res/img/cmi.jpg"></a>
+          <a href="https://isdm.umontpellier.fr/"><img src="res/img/isdm.png"></a>
+          <a href="https://www.chu-montpellier.fr/fr/erios/erios-1"><img src="res/img/erios.jpg"></a>
+          <a href="https://www.chu-montpellier.fr/fr/"><img src="res/img/chu.png"></a>
+          <a href="https://www.dedalus.com/fr/fr/"><img src="res/img/dedalus.png"></a>
+        </div>
+    </div>
+  </main>
+  
+  <script src="fonctions.js"></script>
+  <script>
+    token = getCookie("token");
+    if(token == undefined){
+      window.location.href = '/connexion.html';
+    }
+  </script>
+</body>
+</html>
