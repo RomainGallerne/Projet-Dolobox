@@ -38,7 +38,7 @@ function LoadPatients(patients) {
             console.log(enregistement)
             pain.push({
               "x": enregistement.evaluation_date,
-              "y": (enregistement.level/4095.0) * 10.0
+              "y": (enregistement.level/4095.0)*10.0
             });
           }
           

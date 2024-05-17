@@ -31,7 +31,7 @@ potentiometre = ctrl.Antecedent(
     np.arange(
         VALEUR_MIN_POTENTIOMETRE - 200, 
         VALEUR_MAX_POTENTIOMETRE + 200, 
-        5
+        2
     ),
     'potentiometre'
 )
@@ -40,7 +40,7 @@ douleur = ctrl.Consequent(
     np.arange(
         VALEUR_MIN_DOULEUR - 2, 
         VALEUR_MAX_DOULEUR + 2, 
-        0.5
+        0.2
     ),
     'douleur'
 )
@@ -179,7 +179,7 @@ def exporter_modele():
 
         
         if(valeur_potentiometre == 950):
-            print("INFO : Affichage des courbes pour l'entrée 84.")
+            print("INFO : Affichage des courbes pour l'entrée 950")
             potentiometre.view(sim=douleur_mesure)
             douleur.view(sim=douleur_mesure)
             input()
@@ -201,15 +201,15 @@ def exporter_modele():
     Affichages(y_points, y_points_demi)
     input()
 
-    donnees = {"classe_douleur": y_points}
-    donnees_dixieme = {"classe_douleur_entiere": y_points_demi}
+    donnees = {"fonction_douleur": y_points}
+    donnees_dixieme = {"fonction_douleur": y_points_demi}
 
     """
     Fonction d'export au format JSON
     """
     with open("points_list.json", "w") as json_file:
         json.dump(donnees, json_file)
-    with open("points_list_dixieme.json", "w") as json_file:
+    with open("points_list_demi.json", "w") as json_file:
         json.dump(donnees_dixieme, json_file)
 
 exporter_modele()
