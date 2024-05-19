@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DoloBox Viz</title>
+</head>
+<script type="module" defer>
+    import AuthService from "./js/services/AuthService.js"
+    const authService = new AuthService();
+    
+    if (authService.getCookie("token") && await authService.getLoggedInUser()) {
+        window.location.href = "html/accueil.html";
+    } else {
+        //window.location.href = "html/connexion.html";
+    }
+</script>
+<body>
+    
+</body>
+</html>
