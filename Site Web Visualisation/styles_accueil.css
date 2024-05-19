@@ -1,0 +1,163 @@
+body {
+	margin: 0;
+	background: #ffffff;
+	font-family: "Poppins", sans-serif;
+	font-weight: 500;
+}
+
+.headerBox {
+	width: 90%;
+	margin: 0 auto;
+  display: flex;
+  font-weight: 800;
+}
+
+.headerBox img{
+  display:flex;
+  margin-top:0.3%;
+  height: 80px; /* Hauteur maximale de l'image */
+}
+
+header {
+  background: #55c3d6;
+  height: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+
+.titre {
+  display:ruby;
+}
+
+header::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+.logo {
+  float: left;
+}
+
+h1 {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+h6 {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+nav {
+  float: right;
+  margin-left: auto;
+}
+
+nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+nav li {
+  display: inline-block;
+  margin-left: 70px;
+  padding-top: 23px;
+
+  position: relative;
+}
+
+nav a {
+  color: #444;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+nav a:hover {
+  color: #000;
+}
+
+nav a::before {
+  content: '';
+  display: block;
+  height: 6px;
+  background-color: #444;
+    
+  top:1em;
+  position: absolute;
+  width: 0%;
+
+  transition: all ease-in-out 250ms;
+}
+
+nav a:hover::before {
+  width: 100%;
+}
+
+nav ul li:last-child {
+  margin-right: 0; /* Supprimer la marge à droite pour le dernier élément */
+}
+
+.chart-box{
+  margin-top: 2%;
+  margin-bottom: 2%;
+  margin-left:5%;
+  margin-right:5%;
+}
+
+.chart-container {
+  width: 100%;
+  display: flex;
+}
+
+.small-column {
+  width: 30px;
+  margin-right:20px;
+}
+
+.large-column {
+  width: 90%;
+  overflow-x: scroll;
+}
+
+.container {
+  width: 90em;
+}
+
+.listepatient{
+  width: 30em;
+  background-color: #ccdfe2;
+}
+
+.visu{
+  display:flex;
+}
+
+/* Styles pour la barre de défilement */
+.scrollbar {
+  overflow-y: auto; /* Ajoute une barre de défilement verticale */
+  height: 25em; /* Hauteur fixe de la liste déroulante */
+}
+
+/* Styles pour les éléments de la liste */
+.patient-item {
+  cursor: pointer; /* Curseur pointer pour indiquer que les éléments sont cliquables */
+  padding: 10px;
+  border-bottom: 1px solid #ccc; /* Ligne de séparation entre les patients */
+}
+
+.patient-item:hover {
+  background-color: #f0f0f0; /* Changement de couleur au survol */
+}
+
+h2{
+  text-align: center;
+}
+
+.patientDetails{
+  margin: 5%;
+}
