@@ -8,13 +8,26 @@ from TimerManager import TimerManager
 from Button import Button
 from LedManager import LedManager
 from json import load
-
+from config import Config
 lm = LedManager()
 
 submit_btn = Button(23)
 timer_btn = Button(22,debounce=3000)
 slider = ADC(Pin(36))
-slider.atten(ADC.ATTN_11DB)
+interruptor = ADC(Pin(34))
+interruptor.width(ADC.WIDTH_12BIT)
+slider.width(ADC.WIDTH_12BIT)
+
+def read_switch_position():
+    value = interruptor.read()
+    if value < 1500:  
+        return "Aidant"
+    elif 1500 <= value < 3500:
+        return "Soignant"
+    elif value >= 3500: 
+        return "Patient"
+    else:
+        return "Valeur inconnue"
 
 lm.add_led("submit", Pin(12,Pin.OUT))
 lm.add_led("mode1", Pin(14,Pin.OUT))
@@ -55,20 +68,27 @@ def get_current_datetime():
 def turn_off_all():
     lm = LedManager()
     for i in range(1,len(time_repetitions)+1):
-        print(i)
         lm.off("mode"+str(i))
 
 def do_connect():
-    import network
+    ssid = Config.get_config("WIFI_NAME")
+    password = Config.get_config("WIFI_PASSWORD")
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
+
     if not wlan.isconnected():
-        print('connecting to network...')
-        wlan.connect("", "")
+        wlan.connect(ssid,password) 
+        print('Connecting to network...')        
         while not wlan.isconnected():
-            pass
-    print('network config:', wlan.ifconfig())
-    
+            print('.', end='')
+            time.sleep(1)
+
+    if wlan.isconnected():
+        print('\nNetwork config:', wlan.ifconfig())
+    else:
+        print('\nFailed to connect to network.')
+
+ 
 
 async def send_data():
     value = slider.read()
@@ -84,7 +104,8 @@ async def send_data():
         ]
     api = ApiService()
     print(records)
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjksImlhdCI6MTcxNTk2NDIxMSwiZXhwIjoxNzE1OTY3ODExfQ.K94wj3UxYS2HfS2lMa0KSgNpuYcvZD8tDWCFqnTowwg"
+    print("Rôle: "+read_switch_position())
+    token = Config.get_config("TOKEN")
     try:
         response = await api.add_streams(6,records,token)
         print(response)
@@ -93,6 +114,7 @@ async def send_data():
             return        
     except Exception as e:
         print(e)
+        lm.blink("submit",20000,0.75)
         return
 
 def on_submit(btn):
@@ -133,14 +155,15 @@ def timer_setup(btn):
         global time_repetitions
         mode = (mode + 1) % (len(time_repetitions)+1)
         print("Mode: "+str(mode))
-        tm.get_timers()
         turn_off_all()
         if mode == 0:
             tm.remove_timer("submit_timer")
+            tm.get_timers()
             submit_btn.getButton().irq(trigger=Pin.IRQ_FALLING, handler=on_submit)
             return
         lm.on("mode"+str(mode))
         tm.set_timer("submit_timer",time_repetitions[mode-1],'m',on_timer_submit)
+        tm.get_timers()
         submit_btn.getButton().irq(trigger=0, handler=on_submit)       
 
 
