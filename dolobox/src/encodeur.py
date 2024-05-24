@@ -39,7 +39,7 @@ class Encoder:
            self.huit.value()
         ]
         return self.valeurs_encodeur_rotatifs.index(tab_releve_encodeur_rotatif)
-encoder = Encoder(18,22,23,19)
+encoder = Encoder(21,19,18,5)
 
 
 while True:
