@@ -5,9 +5,7 @@ class Config:
         "TOKEN":"",
         "API_URL":"https://eriospainapi.onrender.com",
         "WIFI_NAME":"",
-        "WIFI_PASSWORD":"",
-        "EMAIL":"",
-        "PASSWORD":""
+        "WIFI_PASSWORD":""
         }
     @staticmethod
     def get_config(name):
