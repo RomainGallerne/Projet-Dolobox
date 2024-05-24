@@ -1,10 +1,10 @@
 from Singleton import Singleton
-
+from config import Config
 @Singleton
 class ApiService:
     def __init__(self):
         # Chargez les paramètres nécessaires
-        self.base_url = "https://eriospainapi.onrender.com"
+        self.base_url = Config.get_config('API_URL')
         
     async def login(self, username, password):
         url = f"{self.base_url}/api/login"
