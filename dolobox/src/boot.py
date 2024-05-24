@@ -1,5 +1,7 @@
-# This file is executed on every boot (including wake-boot from deepsleep)
-import pyb
+# boot.py -- Fichier de configuration exécuté à chaque démarrage
 
+try:
+    import main
+except ImportError:
+    print("main.py not found")
 
-pyb.main('main.py')
