@@ -67,6 +67,7 @@ var myChart = new Chart(ctx, {
         border: {
           display: false,
         },
+        beginAtZero: true
       },
     },
     responsive: true,
@@ -117,7 +118,7 @@ const authService = new AuthService();
 
 const token = authService.getCookie("token");
 if (!token) {
-  window.location.href = "/connexion.html";
+  window.location.href = "/src/html/connexion.html";
 }
 
 loadList();
