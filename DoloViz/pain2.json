@@ -1,0 +1,20 @@
+{"records": [
+	{"evaluation_date": "01/05/2024 15:43:36", "level": 10.0},
+	{"evaluation_date": "02/05/2024 04:20:59", "level": 10.0},
+	{"evaluation_date": "03/05/2024 13:07:24", "level": 9.5},
+	{"evaluation_date": "04/05/2024 21:54:48", "level": 9.0},
+	{"evaluation_date": "05/05/2024 08:32:13", "level": 8.0},
+	{"evaluation_date": "06/05/2024 17:19:37", "level": 8.0},
+	{"evaluation_date": "07/05/2024 02:07:02", "level": 8.0},
+	{"evaluation_date": "08/05/2024 10:54:26", "level": 8.0},
+	{"evaluation_date": "09/05/2024 19:41:51", "level": 5.5},
+	{"evaluation_date": "10/05/2024 05:29:15", "level": 5.0},
+	{"evaluation_date": "11/05/2024 14:16:39", "level": 4.0},
+	{"evaluation_date": "12/05/2024 22:04:04", "level": 3.0},
+	{"evaluation_date": "13/05/2024 06:51:29", "level": 2.5},
+	{"evaluation_date": "14/05/2024 15:38:54", "level": 2.5},
+	{"evaluation_date": "15/05/2024 03:26:18", "level": 2.5},
+	{"evaluation_date": "16/05/2024 12:13:43", "level": 2.0},
+	{"evaluation_date": "17/05/2024 20:01:07", "level": 0.5},
+	{"evaluation_date": "18/05/2024 07:48:32", "level": 0.0}
+]}
