@@ -1,4 +1,4 @@
-from machine import Pin, PWM, ADC, RTC
+from machine import Pin, PWM, ADC, RTC, unique_id
 import network
 import uasyncio
 from time import sleep, sleep_ms
@@ -9,14 +9,15 @@ from Button import Button
 from LedManager import LedManager
 from json import load
 from config import Config
+import ubinascii
 lm = LedManager()
 
-submit_btn = Button(23)
-timer_btn = Button(22,debounce=3000)
+submit_btn = Button(22)
+timer_btn = Button(23,debounce=3000)
 slider = ADC(Pin(36))
 interruptor = ADC(Pin(34))
-interruptor.width(ADC.WIDTH_12BIT)
-slider.width(ADC.WIDTH_12BIT)
+interruptor.atten(ADC.ATTN_11DB)
+slider.atten(ADC.ATTN_11DB)
 
 def read_switch_position():
     value = interruptor.read()
@@ -29,14 +30,14 @@ def read_switch_position():
     else:
         return "Valeur inconnue"
 
-lm.add_led("submit", Pin(12,Pin.OUT))
-lm.add_led("mode1", Pin(14,Pin.OUT))
-lm.add_led("mode2", Pin(13,Pin.OUT))
-lm.add_led("mode3", Pin(27,Pin.OUT))
+lm.add_led("submit", Pin(27,Pin.OUT))
+lm.add_led("mode1", Pin(13,Pin.OUT))
+lm.add_led("mode2", Pin(12,Pin.OUT))
+lm.add_led("mode3", Pin(14,Pin.OUT))
 
 
 
-time_repetitions = [20,60,120]
+time_repetitions = [2,4,6]
 mode = 0
 
 
@@ -52,6 +53,8 @@ def get_slider_value(value):
     f = open('FuzzyLogicModel.json')
     data = load(f)
     f.close()
+    value = 4095-value
+
     return data["fonction_douleur"][value]
 
 def get_current_datetime():
@@ -70,30 +73,9 @@ def turn_off_all():
     for i in range(1,len(time_repetitions)+1):
         lm.off("mode"+str(i))
 
-def do_connect():
-    ssid = Config.get_config("WIFI_NAME")
-    password = Config.get_config("WIFI_PASSWORD")
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-
-    if not wlan.isconnected():
-        wlan.connect(ssid,password) 
-        print('Connecting to network...')        
-        while not wlan.isconnected():
-            print('.', end='')
-            time.sleep(1)
-
-    if wlan.isconnected():
-        print('\nNetwork config:', wlan.ifconfig())
-    else:
-        print('\nFailed to connect to network.')
-
- 
-
 async def send_data():
     value = slider.read()
     date = get_current_datetime()
-    print(value)
     value = get_slider_value(value)
     lm = LedManager()
     if(value == None):
@@ -107,7 +89,7 @@ async def send_data():
     print("Rôle: "+read_switch_position())
     token = Config.get_config("TOKEN")
     try:
-        response = await api.add_streams(6,records,token)
+        response = await api.add_streams(9,records,token)
         print(response)
         if response["message"] == 'Fail':
             lm.blink("submit",20000,0.75)
@@ -166,8 +148,6 @@ def timer_setup(btn):
         tm.get_timers()
         submit_btn.getButton().irq(trigger=0, handler=on_submit)       
 
-
-do_connect()
 
 submit_btn.getButton().irq(trigger=Pin.IRQ_FALLING, handler=on_submit)
 timer_btn.getButton().irq(trigger=Pin.IRQ_FALLING, handler=timer_setup)
